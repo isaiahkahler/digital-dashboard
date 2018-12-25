@@ -15,6 +15,8 @@ const Container = styled.div`
 
 interface DashProps { }
 interface DashState {
+  width: number,
+  height: number,
   rpm: number;
   speed: number;
 }
@@ -23,66 +25,48 @@ export class Dash extends React.Component<DashProps, DashState> {
   constructor(props: DashProps) {
     super(props);
     this.state = {
+      width: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
+      height: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
       rpm: 0,
       speed: 0
     }
   }
 
+  handleResize = () => {
+    console.log("resize")
+    this.setState({
+      width: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
+      height: Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+    })
+  }
+
+  componentDidMount() {
+    this.setState({
+      rpm: 22,
+      speed: 82
+    })
+
+    window.addEventListener('resize', this.handleResize, {passive: true})
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+  }
+
+
   render() {
-
-    const radius = 200;
-    const stroke = 20;
-    const progress = 99;
-
-    const normalizedRadius = radius - stroke * 2;
-    const circumference = normalizedRadius * 2 * Math.PI;
-    const strokeDashoffset = circumference - progress / 100 * circumference;
 
     return (
       <Container>
 
-        <ProgressRing radius={200} stroke={20} progress={this.state.rpm} color="#ff0000" >
-          <ProgressRing radius={200 - 20} stroke={20} progress={this.state.speed} color="#fff" />
+        <ProgressRing radius={(this.state.height / 4)} stroke={20} progress={this.state.rpm} color="#ff0000" >
+          <ProgressRing radius={(this.state.height / 4) - 20} stroke={20} progress={this.state.speed} color="#fff" />
         </ProgressRing>
 
       </Container>
     );
   }
 }
-
-const RPMCircleGauge = styled.div`
-  width: 50vh;
-  height: 50vh;
-  border-radius: 25vh;
-  background-color: #ff0000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: 100ms;
-`;
-
-const SpeedCircleGauge = styled.div`
-  width: 90%;
-  height: 90%;
-  border-radius: 100%;
-  background-color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: 100ms;
-`;
-
-// function CircleGauge(props: any) {
-//   return (
-//     <RPMCircleGauge>
-//       <SpeedCircleGauge>
-//         <SpeedCircleGauge style={{ backgroundColor: "#000" }}>
-
-//         </SpeedCircleGauge>
-//       </SpeedCircleGauge>
-//     </RPMCircleGauge>
-//   );
-// }
 
 
 interface ProgressRingProps {
@@ -126,7 +110,6 @@ class ProgressRing extends React.Component<ProgressRingProps, ProgressRingState>
             strokeWidth={stroke}
             strokeDasharray={this.state.circumference + ' ' + this.state.circumference}
             style={{ strokeDashoffset }}
-            stroke-width={stroke}
             r={this.state.normalizedRadius}
             cx={radius}
             cy={radius}
