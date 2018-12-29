@@ -24,7 +24,7 @@ async def socket_handler(websocket, path):
         websocket.send(json.dumps({ "speed": round(r.value.magnitude ) }))
 
     async def handle_rpm(r):
-        websocket.send(json.dumps({ "rpm": round(r.value.magnitude ) }))
+        websocket.send(json.dumps({ "rpm": 100 * round(r.value.magnitude / 8000 ) }))
     
     async def handle_coolant(r):
         websocket.send(json.dumps({
@@ -44,7 +44,7 @@ async def socket_handler(websocket, path):
     connection.watch(obd.commands.SPEED, callback=handle_speed)
     connection.watch(obd.commands.RPM, callback=handle_rpm)
     connection.watch(obd.commands.COOLANT_TEMP, callback=handle_coolant)
-    connection.watch(obd.commands.THROTTLE_POS, handle_throttle)
+    connection.watch(obd.commands.THROTTLE_POS, callback=handle_throttle)
     connection.start()
 
 
