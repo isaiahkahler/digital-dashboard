@@ -30,6 +30,7 @@ async def socket_handler(websocket, path):
                 await websocket.send(json.dumps({"rpm": 100 * (rpm.magnitude / 8000)}))
 
             speed = connection.query(obd.commands.SPEED).value
+            print(speed)
             if not not speed:
                 await websocket.send(json.dumps({"speed": speed.magnitude}))
 
@@ -45,9 +46,10 @@ async def socket_handler(websocket, path):
                 await websocket.send(json.dumps({"temp": temp}))
 
             throttle = connection.query(obd.commands.THROTTLE_POS).value
+            print(throttle)
             if not not throttle:
                 await websocket.send(json.dumps({"gas": throttle.magnitude}))
-            time.sleep(0.1)
+            # time.sleep(0.1)
 
     # define our handlers, will send data once OBD calls back
     # async def handle_speed(r):
