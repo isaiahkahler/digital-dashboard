@@ -104,7 +104,8 @@ export class Dash extends React.Component<DashProps, DashState> {
         rpm: 25,
         speed: 75,
         gas: 75,
-        temp: 20
+        temp: 20,
+        messages: ["P0321 Engine too hot lol"]
       })
     }, 1000)
     setTimeout(() => {
@@ -121,7 +122,7 @@ export class Dash extends React.Component<DashProps, DashState> {
         speed: 15,
         gas: 45,
         temp: 15,
-        messages: ["P0321 Engine too hot lol", "P28394 ur mom gey"]
+        messages: []
       })
     }, 3000)
     this.updateTime();
