@@ -23,10 +23,20 @@ async def socket_handler(websocket, path):
     await websocket.recv()
     print('connected to client')
 
-    while True:
-        rpm = connection.query(obd.commands.RPM).value.magnitude
-        await websocket.send(json.dumps({"rpm": rpm}))
-        time.sleep(0.5)
+    if not not connection:
+        while True:
+            rpm = connection.query(obd.commands.RPM).value.magnitude / 8000
+            speed = connection.query(obd.commands.SPEED).value.magnitude
+            temp = min(
+                100,
+                round(
+                    100 * (
+                        (max(195, connection.query(obd.commands.COOLANT_TEMP).value.magnitude)) - 195) / 25
+                    )
+                )
+            throttle = connection.query(obd.commands.THROTTLE_POS).value.magnitude
+            await websocket.send(json.dumps({"rpm": rpm, "speed": speed, "temp": temp, "gas": throttle}))
+            time.sleep(0.1)
 
     # define our handlers, will send data once OBD calls back
     # async def handle_speed(r):
@@ -90,6 +100,7 @@ print('websocket server started')
 
 os.system('serve -s /home/pi/digital-dashboard/build &')
 time.sleep(5)
+\
 os.system('chromium-browser --kiosk http://localhost:5000 &')
 
 asyncio.get_event_loop().run_until_complete(start_server)
