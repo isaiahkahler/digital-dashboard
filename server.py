@@ -19,25 +19,21 @@ is_established = False
 async def socket_handler(websocket, path):
     # wait for client websocket
     await websocket.recv()
+    
+    # define our handlers, will send data once OBD calls back
     async def handle_speed(r):
-        value = r.value
-        if not value:
+        if not r:
             return
-
-        await websocket.send(json.dumps({ "speed": round(value.magnitude ) }))
+        await websocket.send(json.dumps({ "speed": round(r.value.magnitude ) }))
 
     async def handle_rpm(r):
-        value = r.value
-        if not value:
+        if not r:
             return
-
-        await websocket.send(json.dumps({ "rpm": 100 * round(value.magnitude / 8000 ) }))
+        await websocket.send(json.dumps({ "rpm": 100 * round(r.value.magnitude / 8000 ) }))
     
     async def handle_coolant(r):
-        value = r.value
-        if not value:
+        if not r:
             return
-
         await websocket.send(json.dumps({
             "temp": min(
                 100,
@@ -59,6 +55,7 @@ async def socket_handler(websocket, path):
     if not connection:
         if is_established:
             connection.stop()
+            connection.unwatch_all()
         # send alerts or whatever
         alerts = connection.query(obd.commands.GET_DTC).value
         await websocket.send(json.dumps({ "alerts": alerts }))
@@ -68,6 +65,15 @@ async def socket_handler(websocket, path):
         connection.watch(obd.commands.THROTTLE_POS, callback=await handle_throttle)
         connection.start()
         is_established = True
+    
+    async for message in websocket:
+        msg = json.loads(message)
+        if 'show-camera' in msg and msg['show-camera'] == True:
+            os.system('mplayer -slave -input file=/home/pi/fifofile tv:// -tv driver=v4l2:norm=NTSC_443:device=/dev/video0 -framedrop -fs')
+            time.sleep(10)
+            os.system('echo "quit" > /home/pi/fifofile')
+
+
 
 
 start_server = websockets.serve(socket_handler, 'localhost', 3001)

@@ -1,9 +1,9 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
-import { OilTemperature, Gas, Alert, ChevRight } from './icons';
+import { OilTemperature, Gas, Alert, ChevRight, Camera } from './icons';
 
-const CenterContainer = styled.div`
+const TopContainer = styled.div`
   width: 100vw;
   height: 100vh;
   position: absolute;
@@ -118,6 +118,10 @@ export class Dash extends React.Component<DashProps, DashState> {
     setTimeout(() => this.updateTime(), 10000)
   }
 
+  handleCameraClick () {
+    this.socket && this.socket.send(JSON.stringify({'show-camera': true}))
+  }
+
   render() {
 
     // const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -126,7 +130,7 @@ export class Dash extends React.Component<DashProps, DashState> {
     return (
       <div>
 
-        <CenterContainer>
+        <TopContainer>
           <ProgressRing radius={(height / 3)} stroke={20} progress={this.state.rpm} color="#ff0000" >
             <ProgressRing radius={(height / 3) - 20} stroke={20} progress={this.state.speed} color="#1e7cff" >
               <CenterText>
@@ -135,10 +139,21 @@ export class Dash extends React.Component<DashProps, DashState> {
               </CenterText>
             </ProgressRing>
           </ProgressRing>
-        </CenterContainer>
+        </TopContainer>
 
         <Container>
           <Column>
+            <div style={{
+              width: '8vw',
+              height: '8vw',
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}>
+              <div onClick={() => this.handleCameraClick()}>
+                <Camera />
+              </div>
+            </div>
           </Column>
           <CenterColumn>
             <h2 style={{ margin: "5vh 0px" }}>{this.state.time}</h2>
@@ -152,18 +167,12 @@ export class Dash extends React.Component<DashProps, DashState> {
             </MessagesContainer>
           </CenterColumn>
           <Column>
-            {/* <div style={{display: "flex", flexDirection: "row"}}> */}
-            {/* <div style={{display: "flex", flexDirection: "column", width: "0"}}>
-                <div style={{ width: "100%", height: (100 - this.state.temp) + "%", borderBottom: "0px solid #000", transition: "250ms" }} />
-                <ChevRight />
-              </div> */}
             <VerticalGauge style={{ backgroundImage: "linear-gradient(red, blue)", flexDirection: "column" }}>
               <IconContainer>
                 <OilTemperature />
               </IconContainer>
               <div style={{ width: "100%", height: (100 - this.state.temp) + "%", backgroundColor: "#000", transition: "250ms" }} />
             </VerticalGauge>
-            {/* </div> */}
             <VerticalGauge>
               <IconContainer>
                 <Gas />
