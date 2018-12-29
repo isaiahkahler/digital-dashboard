@@ -10,34 +10,45 @@ if len(obd.scan_serial()) == 0:
 else:
     connection = obd.Async("/dev/ttyUSB0", baudrate=115200)
 
+
+
 async def socket_handler(websocket, path):
+    # wait for client websocket
     await websocket.recv()
+
+    # send alerts or whatever
     alerts = connection.query(obd.commands.GET_DTC).value
-    await websocket.send(json.dumps({"alerts": alerts}))
-    while True:
-        data = {
-            "speed": round(connection.query(obd.commands.SPEED).value.to('mph').magnitude ),
-            "rpm": round(100 * (connection.query(obd.commands.RPM).value.magnitude / 8000)),
-            "temp": min(100, round(
+    await websocket.send(json.dumps({ "alerts": alerts }))
+
+    async def handle_speed(r):
+        websocket.send(json.dumps({ "speed": round(r.value.magnitude ) }))
+
+    async def handle_rpm(r):
+        websocket.send(json.dumps({ "rpm": round(r.value.magnitude ) }))
+    
+    async def handle_coolant(r):
+        websocket.send(json.dumps({
+            "temp": min(
+                100,
+                round(
                     100 * (
-                        (
-                        max(195, connection.query(obd.commands.COOLANT_TEMP).value.magnitude) - 195
-                        ) / 25
+                        (max(195, r.value.magnitude) - 195) / 25
                     )
-                )),
-            "gas": round(connection.query(obd.commands.THROTTLE_POS).value.magnitude)
-        }
-        await websocket.send(json.dumps(data))
-        time.sleep(0.1)
+                )
+            )
+        }))
+    
+    async def handle_throttle(r):
+        websocket.send(json.dumps({ "throttle": round(r.value.magnitude ) }))
+
+    connection.watch(obd.commands.SPEED, callback=handle_speed)
+    connection.watch(obd.commands.RPM, callback=handle_rpm)
+    connection.watch(obd.commands.COOLANT_TEMP, callback=handle_coolant)
+    connection.watch(obd.commands.THROTTLE_POS, handle_throttle)
+    connection.start()
 
 
 start_server = websockets.serve(socket_handler, 'localhost', 3001)
-
-
-connection.watch(obd.commands.SPEED)
-connection.watch(obd.commands.RPM)
-connection.watch(obd.commands.COOLANT_TEMP)
-connection.watch(obd.commands.THROTTLE_POS)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
