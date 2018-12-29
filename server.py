@@ -25,17 +25,25 @@ async def socket_handler(websocket, path):
 
     if not not connection:
         while True:
-            rpm = connection.query(obd.commands.RPM).value.magnitude / 8000
-            speed = connection.query(obd.commands.SPEED).value.magnitude
-            temp = min(
+            rpm = connection.query(obd.commands.RPM).value
+            if not not rpm:
+                await websocket.send(json.dumps({"rpm": rpm.magnitude / 8000}))
+            speed = connection.query(obd.commands.SPEED).value
+            if not not speed:
+                await websocket.send(json.dumps({"speed": speed.magnitude}))
+            temp = connection.query(obd.commands.COOLANT_TEMP).value
+            if not not temp:
+                temp = min(
                 100,
                 round(
                     100 * (
-                        (max(195, connection.query(obd.commands.COOLANT_TEMP).value.magnitude)) - 195) / 25
+                        (max(195, temp.magnitude)) - 195) / 25
                     )
                 )
-            throttle = connection.query(obd.commands.THROTTLE_POS).value.magnitude
-            await websocket.send(json.dumps({"rpm": rpm, "speed": speed, "temp": temp, "gas": throttle}))
+                await websocket.send(json.dumps({"temp": speed.temp}))
+            throttle = connection.query(obd.commands.THROTTLE_POS).value
+            if not not throttle:
+                await websocket.send(json.dumps({"gas": throttle.magnitude}))
             time.sleep(0.1)
 
     # define our handlers, will send data once OBD calls back
