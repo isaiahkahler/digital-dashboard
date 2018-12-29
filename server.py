@@ -40,7 +40,7 @@ async def socket_handler(websocket, path):
                         (max(195, temp.magnitude)) - 195) / 25
                     )
                 )
-                await websocket.send(json.dumps({"temp": speed.temp}))
+                await websocket.send(json.dumps({"temp": temp.magnitude}))
             throttle = connection.query(obd.commands.THROTTLE_POS).value
             if not not throttle:
                 await websocket.send(json.dumps({"gas": throttle.magnitude}))
