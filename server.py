@@ -51,7 +51,7 @@ async def socket_handler(websocket, path):
             print(throttle)
             if not throttle.is_null():
                 await websocket.send(json.dumps({"gas": throttle.value.magnitude}))
-            time.sleep(0.5)
+            # time.sleep(0.5)
 
     # define our handlers, will send data once OBD calls back
     # async def handle_speed(r):

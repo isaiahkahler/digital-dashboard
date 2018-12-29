@@ -104,6 +104,7 @@ export class Dash extends React.Component<DashProps, DashState> {
       socket.send('hi');
       socket.addEventListener('message', (msg) => {
         const data = JSON.parse(msg.data);
+        console.log(data)
         if ("alerts" in data) {
           let alerts: string[] = [];
           for (let pair of data.alerts) {
