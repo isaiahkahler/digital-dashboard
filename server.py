@@ -24,18 +24,20 @@ async def socket_handler(websocket, path):
     print('connected to client')
 
     if not not connection:
+        alerts = connection.query(obd.commands.GET_DTC).value
+        await websocket.send(json.dumps({ "alerts": alerts }))
         while True:
-            rpm = connection.query(obd.commands.RPM).value
-            if rpm != None:
+            rpm = connection.query(obd.commands.RPM)
+            if not rpm.is_null():
                 await websocket.send(json.dumps({"rpm": 100 * (rpm.magnitude / 8000)}))
 
-            speed = connection.query(obd.commands.SPEED).value
+            speed = connection.query(obd.commands.SPEED)
             print(speed)
-            if speed != None:
+            if not speed.is_null():
                 await websocket.send(json.dumps({"speed": speed.magnitude}))
 
-            temp = connection.query(obd.commands.COOLANT_TEMP).value
-            if temp != None:
+            temp = connection.query(obd.commands.COOLANT_TEMP)
+            if not temp.is_null():
                 temp = min(
                 100,
                 round(
@@ -45,9 +47,9 @@ async def socket_handler(websocket, path):
                 )
                 await websocket.send(json.dumps({"temp": temp}))
 
-            throttle = connection.query(obd.commands.THROTTLE_POS).value
+            throttle = connection.query(obd.commands.THROTTLE_POS)
             print(throttle)
-            if throttle != None:
+            if not throttle.is_null():
                 await websocket.send(json.dumps({"gas": throttle.magnitude}))
             time.sleep(0.5)
 

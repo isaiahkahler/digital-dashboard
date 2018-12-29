@@ -104,7 +104,15 @@ export class Dash extends React.Component<DashProps, DashState> {
       socket.send('hi');
       socket.addEventListener('message', (msg) => {
         const data = JSON.parse(msg.data);
-        this.setState({ ...data });
+        if ("alerts" in data) {
+          let alerts: string[] = [];
+          for (let pair of data.alerts) {
+            alerts.push(pair[0] + ' ' + pair[1])
+          }
+          this.setState({ messages: alerts })
+        } else {
+          this.setState({ ...data });
+        }
       })
     })
     this.updateTime();
@@ -117,8 +125,8 @@ export class Dash extends React.Component<DashProps, DashState> {
     setTimeout(() => this.updateTime(), 10000)
   }
 
-  handleCameraClick () {
-    this.socket && this.socket.send(JSON.stringify({'show-camera': true}))
+  handleCameraClick() {
+    this.socket && this.socket.send(JSON.stringify({ 'show-camera': true }))
   }
 
   render() {
