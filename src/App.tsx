@@ -12,22 +12,11 @@ interface AppState {
 }
 
 class App extends Component<AppProps, AppState> {
-  socket: WebSocket | undefined;
-  
   constructor(props: AppProps){
     super(props);
-    this.socket = new WebSocket('ws://localhost:3001');
     this.state = {
       data: ''
     }
-  }
-
-  componentDidMount = () => {
-    this.socket && this.socket.addEventListener('open', () => {
-      this.socket && this.socket.addEventListener('message', (msg) => {
-        this.setState({data: msg.data})
-      })
-    })
   }
 
   render() {
@@ -37,13 +26,6 @@ class App extends Component<AppProps, AppState> {
       </div> 
     );
   }
-
-  /* 
-    do settings!!
-    choose:
-      -obd2 specific codes
-      -MPH / KMH
-  */
 
 }
 

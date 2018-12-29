@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
-import { OilTemperature, Gas, Alert } from './icons';
+import { OilTemperature, Gas, Alert, ChevRight } from './icons';
 
 const CenterContainer = styled.div`
   width: 100vw;
@@ -26,7 +26,7 @@ const Container = styled.div`
 `;
 
 const Column = styled.div`
-  width: 10vw;
+  padding: 0px 5vh;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -81,8 +81,11 @@ interface DashState {
 }
 
 export class Dash extends React.Component<DashProps, DashState> {
+  socket: WebSocket | undefined;
+
   constructor(props: DashProps) {
     super(props);
+    this.socket = new WebSocket('ws://localhost:3001');
     this.state = {
       time: moment().format("LT"),
       rpm: 0,
@@ -93,38 +96,27 @@ export class Dash extends React.Component<DashProps, DashState> {
     }
   }
 
-  componentDidMount = () => {
-    this.setState({
-      rpm: 22,
-      speed: 0
-    })
 
-    setTimeout(() => {
-      this.setState({
-        rpm: 25,
-        speed: 75,
-        gas: 75,
-        temp: 20,
-        messages: ["P0321 Engine too hot lol"]
+  componentDidMount = () => {
+    this.socket && this.socket.addEventListener('open', () => {
+      this.socket && this.socket.addEventListener('message', (msg) => {
+        let data: { "alerts": Array<Array<string>> } | { rpm: number, speed: number, gas: number, temp: number } = JSON.parse(msg.data);
+        if ("alerts" in data) {
+          let alerts: string[] = [];
+          for (let pair of data.alerts) {
+            alerts.push(pair[0] + ' ' + pair[1])
+          }
+          this.setState({ messages: alerts })
+        } else {
+          this.setState({
+            rpm: data.rpm,
+            speed: data.speed,
+            gas: data.gas,
+            temp: data.temp
+          })
+        }
       })
-    }, 1000)
-    setTimeout(() => {
-      this.setState({
-        rpm: 0,
-        speed: 25,
-        gas: 12,
-        temp: 95
-      })
-    }, 2000)
-    setTimeout(() => {
-      this.setState({
-        rpm: 5,
-        speed: 15,
-        gas: 45,
-        temp: 15,
-        messages: []
-      })
-    }, 3000)
+    })
     this.updateTime();
   }
 
@@ -147,7 +139,7 @@ export class Dash extends React.Component<DashProps, DashState> {
           <ProgressRing radius={(height / 3)} stroke={20} progress={this.state.rpm} color="#ff0000" >
             <ProgressRing radius={(height / 3) - 20} stroke={20} progress={this.state.speed} color="#1e7cff" >
               <CenterText>
-                <h1>{Math.round(this.state.speed)}</h1>
+                <h1>{this.state.speed}</h1>
                 <h3>MPH</h3>
               </CenterText>
             </ProgressRing>
@@ -156,26 +148,31 @@ export class Dash extends React.Component<DashProps, DashState> {
 
         <Container>
           <Column>
-            <VerticalGauge></VerticalGauge>
           </Column>
           <CenterColumn>
             <h2 style={{ margin: "5vh 0px" }}>{this.state.time}</h2>
             <MessagesContainer>
               {this.state.messages.map((item, index) => {
-                return(<div key={index}>
-                  <Alert style={{display: "inline", verticalAlign: "middle"}} />
-                  <h3 style={{display: "inline", verticalAlign: "middle"}}>{item}</h3>
+                return (<div key={index}>
+                  <Alert style={{ display: "inline", verticalAlign: "middle" }} />
+                  <h3 style={{ display: "inline", verticalAlign: "middle" }}>{item}</h3>
                 </div>)
               })}
             </MessagesContainer>
           </CenterColumn>
           <Column>
-            <VerticalGauge style={{backgroundImage: "linear-gradient(red, blue)", flexDirection: "column"}}>
-              <IconContainer>
-                <OilTemperature />
-              </IconContainer>
-              <div style={{ width: "100%", height: (100 - this.state.temp) + "%", backgroundColor: "#000", transition: "250ms" }} />
-            </VerticalGauge>
+            {/* <div style={{display: "flex", flexDirection: "row"}}> */}
+              {/* <div style={{display: "flex", flexDirection: "column", width: "0"}}>
+                <div style={{ width: "100%", height: (100 - this.state.temp) + "%", borderBottom: "0px solid #000", transition: "250ms" }} />
+                <ChevRight />
+              </div> */}
+              <VerticalGauge style={{ backgroundImage: "linear-gradient(red, blue)", flexDirection: "column" }}>
+                <IconContainer>
+                  <OilTemperature />
+                </IconContainer>
+                <div style={{ width: "100%", height: (100 - this.state.temp) + "%", backgroundColor: "#000", transition: "250ms" }} />
+              </VerticalGauge>
+            {/* </div> */}
             <VerticalGauge>
               <IconContainer>
                 <Gas />

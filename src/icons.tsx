@@ -16,10 +16,18 @@ export function Gas(props: {}) {
     );
 }
 
-export function Alert(props: {style: React.CSSProperties}) {
+export function Alert(props: { style: React.CSSProperties }) {
     return (
-        <svg style={{...props.style, width: "8vw", height: "8vw" }} viewBox="0 0 24 24">
+        <svg style={{ ...props.style, width: "8vw", height: "8vw" }} viewBox="0 0 24 24">
             <path fill="#ff0000" d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z" />
+        </svg>
+    );
+}
+
+export function ChevRight(props: {}) {
+    return (
+        <svg style={{width: '8vw', height: "8vw"}} viewBox="0 0 24 24">
+            <path fill="#fff" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
         </svg>
     );
 }

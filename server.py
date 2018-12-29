@@ -16,10 +16,16 @@ async def socket_handler(websocket, path):
     await websocket.send(json.dumps({"alerts": alerts}))
     while True:
         data = {
-            "speed": connection.query(obd.commands.SPEED).value.to('mph'),
-            "rpm": connection.query(obd.commands.RPM).value,
-            "temp": connection.query(obd.commands.COOLANT_TEMP).value,
-            "gas": connection.query(obd.commands.THROTTLE_POS).value
+            "speed": round(connection.query(obd.commands.SPEED).value.to('mph').magnitude ),
+            "rpm": round(100 * (connection.query(obd.commands.RPM).value.magnitude / 8000)),
+            "temp": min(100, round(
+                    100 * (
+                        (
+                        max(195, connection.query(obd.commands.COOLANT_TEMP).value.magnitude) - 195
+                        ) / 25
+                    )
+                )),
+            "gas": round(connection.query(obd.commands.THROTTLE_POS).value.magnitude)
         }
         await websocket.send(json.dumps(data))
         time.sleep(0.1)
