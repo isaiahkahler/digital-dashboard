@@ -28,9 +28,11 @@ async def socket_handler(websocket, path):
             rpm = connection.query(obd.commands.RPM).value
             if not not rpm:
                 await websocket.send(json.dumps({"rpm": rpm.magnitude / 8000}))
+
             speed = connection.query(obd.commands.SPEED).value
             if not not speed:
                 await websocket.send(json.dumps({"speed": speed.magnitude}))
+
             temp = connection.query(obd.commands.COOLANT_TEMP).value
             if not not temp:
                 temp = min(
@@ -40,7 +42,8 @@ async def socket_handler(websocket, path):
                         (max(195, temp.magnitude)) - 195) / 25
                     )
                 )
-                await websocket.send(json.dumps({"temp": temp.magnitude}))
+                await websocket.send(json.dumps({"temp": temp}))
+
             throttle = connection.query(obd.commands.THROTTLE_POS).value
             if not not throttle:
                 await websocket.send(json.dumps({"gas": throttle.magnitude}))
