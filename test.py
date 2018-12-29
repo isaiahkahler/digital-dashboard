@@ -6,9 +6,14 @@ import json
 
 async def socket_handler(websocket, path):
     await websocket.recv()
+
+    async def handler():
+        await websocket.send('hahaha')
+        print('in the handler')
+
     while True:
-        print('lol')
-        await websocket.send(json.dumps({"rmp": 30, "speed": "some number, probably"}))
+        await handler()
+        print ('called the handler')
         time.sleep(5)
 
 
