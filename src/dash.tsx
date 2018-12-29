@@ -98,16 +98,12 @@ export class Dash extends React.Component<DashProps, DashState> {
 
 
   componentDidMount() {
-    console.log("mount")
     const socket = this.socket;
     if (!socket) return;
-    console.log("nani??")
     socket.addEventListener('open', () => {
-      console.log("socket open")
       socket.send('hi');
       socket.addEventListener('message', (msg) => {
         const data = JSON.parse(msg.data);
-        console.log(data)
         this.setState({ ...data });
       })
     })

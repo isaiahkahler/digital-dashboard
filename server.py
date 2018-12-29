@@ -27,12 +27,10 @@ async def socket_handler(websocket, path):
         while True:
             rpm = connection.query(obd.commands.RPM).value
             if not not rpm:
-                print("rpm", rpm.magnitude)
-                await websocket.send(json.dumps({"rpm": rpm.magnitude / 8000}))
+                await websocket.send(json.dumps({"rpm": 100 * (rpm.magnitude / 8000)}))
 
             speed = connection.query(obd.commands.SPEED).value
             if not not speed:
-                print("speed", speed.magnitude)
                 await websocket.send(json.dumps({"speed": speed.magnitude}))
 
             temp = connection.query(obd.commands.COOLANT_TEMP).value
