@@ -98,6 +98,7 @@ export class Dash extends React.Component<DashProps, DashState> {
 
 
   componentDidMount() {
+    console.log("mount")
     const socket = this.socket;
     if (!socket) return;
     console.log("nani??")
