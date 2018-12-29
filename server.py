@@ -14,12 +14,11 @@ else:
     connection = obd.Async("/dev/ttyUSB0", baudrate=115200)
     print('connection to OBD-II was established')
 
-
+is_established = False
 
 async def socket_handler(websocket, path):
     # wait for client websocket
     await websocket.recv()
-
     async def handle_speed(r):
         value = r.value
         if not value:
@@ -58,6 +57,8 @@ async def socket_handler(websocket, path):
 
 
     if not connection:
+        if is_established:
+            connection.stop()
         # send alerts or whatever
         alerts = connection.query(obd.commands.GET_DTC).value
         await websocket.send(json.dumps({ "alerts": alerts }))
@@ -66,15 +67,16 @@ async def socket_handler(websocket, path):
         connection.watch(obd.commands.COOLANT_TEMP, callback=await handle_coolant)
         connection.watch(obd.commands.THROTTLE_POS, callback=await handle_throttle)
         connection.start()
+        is_established = True
 
 
 start_server = websockets.serve(socket_handler, 'localhost', 3001)
 
 print('websocket server started')
 
-# os.system('serve -s /home/pi/digital-dashboard/build')
-# time.sleep(5)
-# os.system('chromium-browser --kiosk http://localhost:3000')
+os.system('serve -s /home/pi/digital-dashboard/build &')
+time.sleep(5)
+os.system('chromium-browser --kiosk http://localhost:3000 &')
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
