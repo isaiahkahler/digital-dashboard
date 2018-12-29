@@ -21,25 +21,41 @@ async def socket_handler(websocket, path):
     await websocket.send(json.dumps({ "alerts": alerts }))
 
     async def handle_speed(r):
-        websocket.send(json.dumps({ "speed": round(r.value.magnitude ) }))
+        value = r.value
+        if not value:
+            return
+
+        websocket.send(json.dumps({ "speed": round(value.magnitude ) }))
 
     async def handle_rpm(r):
-        websocket.send(json.dumps({ "rpm": 100 * round(r.value.magnitude / 8000 ) }))
+        value = r.value
+        if not value:
+            return
+
+        websocket.send(json.dumps({ "rpm": 100 * round(value.magnitude / 8000 ) }))
     
     async def handle_coolant(r):
+        value = r.value
+        if not value:
+            return
+
         websocket.send(json.dumps({
             "temp": min(
                 100,
                 round(
                     100 * (
-                        (max(195, r.value.magnitude) - 195) / 25
+                        (max(195, value.magnitude) - 195) / 25
                     )
                 )
             )
         }))
     
     async def handle_throttle(r):
-        websocket.send(json.dumps({ "throttle": round(r.value.magnitude ) }))
+        value = r.value
+        if not value:
+            return
+
+        websocket.send(json.dumps({ "throttle": round(value.magnitude ) }))
 
     connection.watch(obd.commands.SPEED, callback=handle_speed)
     connection.watch(obd.commands.RPM, callback=handle_rpm)
