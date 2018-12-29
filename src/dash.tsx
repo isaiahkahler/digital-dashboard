@@ -97,24 +97,14 @@ export class Dash extends React.Component<DashProps, DashState> {
   }
 
 
-  componentDidMount = () => {
-    this.socket && this.socket.addEventListener('open', () => {
-      this.socket && this.socket.addEventListener('message', (msg) => {
-        let data: { "alerts": Array<Array<string>> } | { rpm: number, speed: number, gas: number, temp: number } = JSON.parse(msg.data);
-        if ("alerts" in data) {
-          let alerts: string[] = [];
-          for (let pair of data.alerts) {
-            alerts.push(pair[0] + ' ' + pair[1])
-          }
-          this.setState({ messages: alerts })
-        } else {
-          this.setState({
-            rpm: data.rpm,
-            speed: data.speed,
-            gas: data.gas,
-            temp: data.temp
-          })
-        }
+  componentDidMount() {
+    const socket = this.socket;
+    if (!socket) return;
+
+    socket.addEventListener('open', () => {
+      socket.addEventListener('message', (msg) => {
+        const data = JSON.parse(msg.data);
+        this.setState({ ...data });
       })
     })
     this.updateTime();
@@ -162,16 +152,16 @@ export class Dash extends React.Component<DashProps, DashState> {
           </CenterColumn>
           <Column>
             {/* <div style={{display: "flex", flexDirection: "row"}}> */}
-              {/* <div style={{display: "flex", flexDirection: "column", width: "0"}}>
+            {/* <div style={{display: "flex", flexDirection: "column", width: "0"}}>
                 <div style={{ width: "100%", height: (100 - this.state.temp) + "%", borderBottom: "0px solid #000", transition: "250ms" }} />
                 <ChevRight />
               </div> */}
-              <VerticalGauge style={{ backgroundImage: "linear-gradient(red, blue)", flexDirection: "column" }}>
-                <IconContainer>
-                  <OilTemperature />
-                </IconContainer>
-                <div style={{ width: "100%", height: (100 - this.state.temp) + "%", backgroundColor: "#000", transition: "250ms" }} />
-              </VerticalGauge>
+            <VerticalGauge style={{ backgroundImage: "linear-gradient(red, blue)", flexDirection: "column" }}>
+              <IconContainer>
+                <OilTemperature />
+              </IconContainer>
+              <div style={{ width: "100%", height: (100 - this.state.temp) + "%", backgroundColor: "#000", transition: "250ms" }} />
+            </VerticalGauge>
             {/* </div> */}
             <VerticalGauge>
               <IconContainer>
