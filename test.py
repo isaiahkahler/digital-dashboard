@@ -2,7 +2,9 @@ import asyncio
 import websockets
 import time
 import json
-
+import os
+# from concurrent.futures import ProcessPoolExecutor
+# from threading import Thread 
 
 async def socket_handler(websocket, path):
 
@@ -16,25 +18,64 @@ async def socket_handler(websocket, path):
         time.sleep(5)
 
 async def socket_handler2(websocket, path):
-    def send_message(message):
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        result = loop.run_until_complete(websocket.send(message))
+    async for message in websocket:
+        print(message)
+    
 
-    await websocket.recv()
-    print('received')
-    send_message('hi this is from python, and i kinda dont like it')
+async def socket_handler3(websocket, path):
+    async def send_message(message):
+        await websocket.send("hello")
 
-def socket_handler3(websocket, path):
+    print(await websocket.recv())
+    # send_message('hello')
+    loop = asyncio.get_event_loop()
+    loop.create_task(send_message('hi'))
+
+
+async def consumer_handler(websocket, path):
+    print(websocket)
     while True:
-        websocket.send('hi this is from python, and i kinda dont like it')
-        print('this is synchronous?')
+        message = await websocket.recv()
+        print(message)
+    # async for message in websocket:
+    #     print(message)
+    #     await websocket.send(message + " response")
+    print('listener terminated')
+
+async def producer_handler(websocket, path):
+    # print('hi')
+    while True:
+        message = "hello"
+        await websocket.send(message)
         time.sleep(1)
 
-start_server = websockets.serve(socket_handler3, 'localhost', 3001)
+
+async def socket_handler4(websocket, path):
+    consumer_task = asyncio.ensure_future(
+        consumer_handler(websocket, path))
+    producer_task = asyncio.ensure_future(
+        producer_handler(websocket, path))
+    done, pending = await asyncio.wait(
+        [consumer_task, producer_task],
+        return_when=asyncio.FIRST_COMPLETED,
+    )
+    for task in pending:
+        task.cancel()
+
+
+    # loop = asyncio.get_event_loop()
+    # loop.create_task(send_messages())
+    # loop.create_task(send_messages2())
+    # loop.create_task(listener())
+
+
+    # executor = ProcessPoolExecutor(2)
+    # loop = asyncio.get_event_loop()
+    # asyncio.ensure_future(loop.run_in_executor(executor, send_messages(websocket)))
+    # asyncio.ensure_future(loop.run_in_executor(executor, send_messages2(websocket)))
+        
+
+start_server = websockets.serve(socket_handler4, 'localhost', 3001)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
-
-# async def myFunction():
-#     print('hi')

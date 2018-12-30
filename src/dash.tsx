@@ -6,7 +6,7 @@ import { OilTemperature, Gas, Alert, ChevRight, Camera } from './icons';
 const TopContainer = styled.div`
   width: 100vw;
   height: 100vh;
-  position: absolute;
+  background-color: #000;
   z-index: 2;
   color: #fff;
   display: flex;
@@ -17,8 +17,8 @@ const TopContainer = styled.div`
 const Container = styled.div`
   width: 100vw;
   height: 100vh;
+  position: absolute;
   color: #fff;
-  background-color: #000;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -137,18 +137,6 @@ export class Dash extends React.Component<DashProps, DashState> {
 
     return (
       <div>
-
-        <TopContainer>
-          <ProgressRing radius={(height / 3)} stroke={20} progress={this.state.rpm} color="#ff0000" >
-            <ProgressRing radius={(height / 3) - 20} stroke={20} progress={this.state.speed} color="#1e7cff" >
-              <CenterText>
-                <h1>{this.state.speed}</h1>
-                <h3>MPH</h3>
-              </CenterText>
-            </ProgressRing>
-          </ProgressRing>
-        </TopContainer>
-
         <Container>
           <Column>
             <div style={{
@@ -190,6 +178,16 @@ export class Dash extends React.Component<DashProps, DashState> {
           </Column>
         </Container>
 
+        <TopContainer>
+          <ProgressRing radius={(height / 3)} stroke={20} progress={this.state.rpm} color="#ff0000" >
+            <ProgressRing radius={(height / 3) - 20} stroke={20} progress={this.state.speed} color="#1e7cff" >
+              <CenterText>
+                <h1>{this.state.speed}</h1>
+                <h3>MPH</h3>
+              </CenterText>
+            </ProgressRing>
+          </ProgressRing>
+        </TopContainer>
       </div>
     );
   }
