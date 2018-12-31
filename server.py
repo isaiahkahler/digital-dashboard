@@ -53,7 +53,7 @@ async def consumer_handler(websocket, path):
                     )
                 )
                 await websocket.send(json.dumps({"temp": temp}))
-        elif 'get-gas' in msg and msg['get-gas'] == True:
+        # elif 'get-gas' in msg and msg['get-gas'] == True:
             # await asyncio.sleep(0.05)
             # gas = connection.query(obd.commands.FUEL_LEVEL)
             # if not gas.is_null():
