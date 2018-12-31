@@ -1,68 +1,72 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+hi this is a project i did over winter break in 2018. its a digital dashboard of my car that displays RPM, speed, fuel level, and coolant temperature. it gives an alert message for any diagnostic trouble codes (check engine light), so save yourself a trip to the mechanic. it also has a button that launches a rear-view camera.
 
-## Available Scripts
+even though nobody will ever use this or attempt to make this but me, heres some ~documentation~ about how it works and remaking it:
 
-In the project directory, you can run:
+### parts
+- raspberry pi 3
+- raspberry pi touchscreen
+- USB OBD-II adapter
+- EasyCap UTV007 USB video capture thing (find it on amazon)
+- rear-view camera with composite output
+- some USB ports in your car, for power
 
-### `npm start`
+### hardware install
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+i got one of the backup cameras that installs behind the license plate, which i recommend. routed the cable through the back seats and up into the front dash.
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+in order to power the camera, you have to wire it up to one of your reverse lights, which i just did by cutting the wires, soldering on, and then taped it up (probably not ideal, but it works).
 
-### `npm test`
+the OBD-II thing is always plugged into my car's port. i didn't want to go with a bluetooth one because of like latency and battery drain and whatnot,but the software should work either way.
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### software setup
 
-### `npm run build`
+download code! then
+```
+npm install
+npm run build
+```
+if all of these dependencies are out of date by the time youre reading this, oh well! sorry!
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+easycap driver is built into raspbian now! so just 
+`sudo apt-get -y install mplayer` for the viewer software.
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+you can test your camera if you want with
+```
+mplayer tv:// -tv driver=v4l2:norm=NTSC_443:device=/dev/video0 -framedrop
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+make a special fifo file! (idk what this actually is, but 'fifo' sounds funny to me. this file will give control over the player software from the python script )
+```
+mkfifo /home/pi/digital-dashboard/fifofile
+```
 
-### `npm run eject`
+some python packages are needed
+```
+pip3 install obd
+pip3 install websockets
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+to make the code run at startup, edit the autorun file. this has changed over time with raspbian but right now in stretch do
+```
+sudo nano /home/pi/.config/lxsession/LXDE-pi/autostart
+```
+add to the end
+```
+@python3 /home/pi/digital-dashboard/server.py
+```
+you might have to install python3, so maybe do that
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+the `server.py` script does everything, so maybe a lot could go wrong. you'll probably need to change a few things around too.
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+on line 14, change the `connection` variable to use the standard OBD constructor. it'll auto connect to your OBD reader, and then your car.
+```
+connection = obd.OBD()
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+do some exploring and see what cool information you can get from your car. there's a [wikipedia page](https://en.wikipedia.org/wiki/OBD-II_PIDs) filled with all of the possible values your car can give and the [python docs](https://python-obd.readthedocs.io/en/latest/) for the library show you how to find out what your car supports. 
 
-## Learn More
+your car might not be able to get some info the dash requests (RPM, speed, coolant temp, and fuel level), while you may want to include some that the dash doesn't support, so go change stuff. 
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+actually, as of writing this, my car doesn't support the fuel level command, so it's commented out in all of the code. if you want to enable that, change `server.py` and `dash.tsx`.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+okay im tired now, email me if you have a question isaiahwkahler@gmail.com
