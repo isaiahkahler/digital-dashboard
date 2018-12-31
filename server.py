@@ -22,9 +22,9 @@ async def producer_handler(websocket, path):
         await websocket.send(json.dumps({ "alerts": alerts }))
         while True:
             rpm = connection.query(obd.commands.RPM)
-            asyncio.sleep(0.05)
+            await asyncio.sleep(0.05)
             speed = connection.query(obd.commands.SPEED)
-            asyncio.sleep(0.05)
+            await asyncio.sleep(0.05)
             # throttle = connection.query(obd.commands.THROTTLE_POS)
             # asyncio.sleep(0.05)
 
@@ -38,7 +38,9 @@ async def producer_handler(websocket, path):
             #     await websocket.send(json.dumps({"gas": throttle.value.magnitude}))
 
 async def consumer_handler(websocket, path):
-    async for message in websocket:
+    # async for message in websocket:
+    while True:
+        message = await websocket.revc()
         msg = json.loads(message)
         if 'show-camera' in msg and msg['show-camera'] == True:
             print('fhsdjlfjdslkf djksl fjdslk fjds fjkds jfklds fkld sjfk djklf jdslkf jdskl fjsdk fjkdsl fjlds jfls')
