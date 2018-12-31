@@ -44,7 +44,7 @@ async def consumer_handler(websocket, path):
         msg = json.loads(message)
         if 'show-camera' in msg and msg['show-camera'] == True:
             os.system('mplayer -slave -input file=/home/pi/digital-dashboard/fifofile tv:// -tv driver=v4l2:norm=NTSC_443:device=/dev/video0 -framedrop -fs &')
-            await asyncio.sleep(15)
+            await asyncio.sleep(45)
             os.system('echo "quit" > /home/pi/digital-dashboard/fifofile &')
         elif 'get-temp' in msg and msg['get-temp'] == True:
             asyncio.sleep(0.05)
