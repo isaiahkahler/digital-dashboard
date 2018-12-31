@@ -35,8 +35,10 @@ async def socket_handler3(websocket, path):
 async def consumer_handler(websocket, path):
     print(websocket)
     while True:
+        print("in the loop!!!!!")
         message = await websocket.recv()
         print(message)
+        print('hmm')
     # async for message in websocket:
     #     print(message)
     #     await websocket.send(message + " response")
@@ -47,7 +49,7 @@ async def producer_handler(websocket, path):
     while True:
         message = "hello"
         await websocket.send(message)
-        time.sleep(1)
+        await asyncio.sleep(1)
 
 
 async def socket_handler4(websocket, path):

@@ -2,7 +2,6 @@ import obd
 import asyncio
 import websockets
 import os
-import time
 import json
 
 print('finished imports')
@@ -23,36 +22,40 @@ async def producer_handler(websocket, path):
         await websocket.send(json.dumps({ "alerts": alerts }))
         while True:
             rpm = connection.query(obd.commands.RPM)
+            asyncio.sleep(0.05)
             speed = connection.query(obd.commands.SPEED)
-            temp = connection.query(obd.commands.COOLANT_TEMP)
-            throttle = connection.query(obd.commands.THROTTLE_POS)
+            asyncio.sleep(0.05)
+            # throttle = connection.query(obd.commands.THROTTLE_POS)
+            # asyncio.sleep(0.05)
 
             if not rpm.is_null():
                 await websocket.send(json.dumps({"rpm": 100 * (rpm.value.magnitude / 8000)}))
 
             if not speed.is_null():
-                await websocket.send(json.dumps({"speed": speed.value.magnitude}))
+                await websocket.send(json.dumps({"speed": round(speed.value.to('mph').magnitude)}))
 
-            if not temp.is_null():
-                temp = min(
-                100,
-                round(
-                    100 * (
-                        (max(195, temp.value.magnitude)) - 195) / 25
-                    )
-                )
-                await websocket.send(json.dumps({"temp": temp}))
-
-            if not throttle.is_null():
-                await websocket.send(json.dumps({"gas": throttle.value.magnitude}))
+            # if not throttle.is_null():
+            #     await websocket.send(json.dumps({"gas": throttle.value.magnitude}))
 
 async def consumer_handler(websocket, path):
     async for message in websocket:
         msg = json.loads(message)
         if 'show-camera' in msg and msg['show-camera'] == True:
             os.system('mplayer -slave -input file=/tmp/fifofile tv:// -tv driver=v4l2:norm=NTSC_443:device=/dev/video0 -framedrop -fs')
-            time.sleep(15)
+            asyncio.sleep(15)
             os.system('echo "quit" > /tmp/fifofile')
+        elif 'get-temp' in msg and msg['get-temp'] == True:
+            asyncio.sleep(0.05)
+            temp = connection.query(obd.commands.COOLANT_TEMP)
+            if not temp.is_null():
+                temp = min(
+                100,
+                round(
+                    100 * (
+                        (max(90, temp.value.magnitude)) - 90) / 25 # measurement in celsius 
+                    )
+                )
+                await websocket.send(json.dumps({"temp": temp}))
 
 
 
@@ -80,7 +83,7 @@ start_server = websockets.serve(socket_handler, 'localhost', 3001)
 print('websocket server started')
 
 os.system('serve -s /home/pi/digital-dashboard/build &')
-os.system('chromium-browser --start-fullscreen http://localhost:5000 &')
+os.system('chromium-browser --start-fullscreen --disable-session-crashed-bubble --disable-infobars http://localhost:5000 &')
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()

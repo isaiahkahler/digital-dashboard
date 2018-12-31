@@ -75,7 +75,7 @@ interface DashState {
   time: string,
   rpm: number,
   speed: number,
-  gas: number,
+  // gas: number,
   temp: number,
   messages: string[]
 }
@@ -90,7 +90,7 @@ export class Dash extends React.Component<DashProps, DashState> {
       time: moment().format("LT"),
       rpm: 0,
       speed: 0,
-      gas: 0,
+      // gas: 0,
       temp: 0,
       messages: []
     }
@@ -104,7 +104,6 @@ export class Dash extends React.Component<DashProps, DashState> {
       socket.send('hi');
       socket.addEventListener('message', (msg) => {
         const data = JSON.parse(msg.data);
-        console.log(data)
         if ("alerts" in data) {
           let alerts: string[] = [];
           for (let pair of data.alerts) {
@@ -124,6 +123,11 @@ export class Dash extends React.Component<DashProps, DashState> {
       time: moment().format("LT")
     })
     setTimeout(() => this.updateTime(), 10000)
+  }
+
+  getCoolantTemp = () => {
+    this.socket && this.socket.send(JSON.stringify({"get-temp": true}))
+    setTimeout(() => this.getCoolantTemp(), 60000)
   }
 
   handleCameraClick() {
@@ -167,14 +171,14 @@ export class Dash extends React.Component<DashProps, DashState> {
               <IconContainer>
                 <OilTemperature />
               </IconContainer>
-              <div style={{ width: "100%", height: (100 - this.state.temp) + "%", backgroundColor: "#000", transition: "250ms" }} />
+              <div style={{ width: "100%", height: (100 - this.state.temp) + "%", backgroundColor: "#000", transition: "250ms", transitionTimingFunction: "linear" }} />
             </VerticalGauge>
-            <VerticalGauge>
+            {/* <VerticalGauge>
               <IconContainer>
                 <Gas />
               </IconContainer>
-              <div style={{ width: "100%", height: this.state.gas + "%", backgroundColor: "#23D160", transition: "250ms" }} />
-            </VerticalGauge>
+              <div style={{ width: "100%", height: this.state.gas + "%", backgroundColor: "#23D160", transition: "250ms", transitionTimingFunction: "linear" }} />
+            </VerticalGauge> */}
           </Column>
         </Container>
 
