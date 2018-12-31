@@ -49,7 +49,7 @@ async def consumer_handler(websocket, path):
                 100,
                 round(
                     100 * (
-                        (max(90, temp.value.magnitude)) - 90) / 25 # measurement in celsius 
+                        (max(60, temp.value.magnitude)) - 60) / 20 # measurement in celsius 
                     )
                 )
                 await websocket.send(json.dumps({"temp": temp}))
