@@ -25,17 +25,12 @@ async def producer_handler(websocket, path):
             await asyncio.sleep(0.05)
             speed = connection.query(obd.commands.SPEED)
             await asyncio.sleep(0.05)
-            # throttle = connection.query(obd.commands.THROTTLE_POS)
-            # asyncio.sleep(0.05)
 
             if not rpm.is_null():
                 await websocket.send(json.dumps({"rpm": 100 * (rpm.value.magnitude / 8000)}))
 
             if not speed.is_null():
                 await websocket.send(json.dumps({"speed": round(speed.value.to('mph').magnitude)}))
-
-            # if not throttle.is_null():
-            #     await websocket.send(json.dumps({"gas": throttle.value.magnitude}))
 
 async def consumer_handler(websocket, path):
     # async for message in websocket:
@@ -47,7 +42,7 @@ async def consumer_handler(websocket, path):
             await asyncio.sleep(45)
             os.system('echo "quit" > /home/pi/digital-dashboard/fifofile &')
         elif 'get-temp' in msg and msg['get-temp'] == True:
-            asyncio.sleep(0.05)
+            await asyncio.sleep(0.05)
             temp = connection.query(obd.commands.COOLANT_TEMP)
             if not temp.is_null():
                 temp = min(
@@ -58,6 +53,13 @@ async def consumer_handler(websocket, path):
                     )
                 )
                 await websocket.send(json.dumps({"temp": temp}))
+        elif 'get-gas' in msg and msg['get-gas'] == True:
+            # await asyncio.sleep(0.05)
+            # gas = connection.query(obd.commands.FUEL_LEVEL)
+            # if not gas.is_null():
+            #     await websocket.send(json.dumps({"gas": gas .value.magnitude}))
+
+
 
 
 

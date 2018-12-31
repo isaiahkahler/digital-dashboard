@@ -118,6 +118,8 @@ export class Dash extends React.Component<DashProps, DashState> {
       })
     })
     this.updateTime();
+    this.getCoolantTemp();
+    // this.getGasLevel();
   }
 
   updateTime = () => {
@@ -131,6 +133,11 @@ export class Dash extends React.Component<DashProps, DashState> {
     this.socket && this.socket.send(JSON.stringify({"get-temp": true}))
     setTimeout(() => this.getCoolantTemp(), 60000)
   }
+
+  // getGasLevel = () => {
+  //   this.socket && this.socket.send(JSON.stringify({"get-gas": true}))
+  //   setTimeout(() => this.getGasLevel(), 60000)
+  // }
 
   handleCameraClick() {
     this.socket && this.socket.send(JSON.stringify({ 'show-camera': true }))
