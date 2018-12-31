@@ -1,5 +1,7 @@
 hi this is a project i did over winter break in 2018. its a digital dashboard of my car that displays RPM, speed, fuel level, and coolant temperature. it gives an alert message for any diagnostic trouble codes (check engine light), so save yourself a trip to the mechanic. it also has a button that launches a rear-view camera.
 
+![digital dashboard](https://raw.githubusercontent.com/isaiahkahler/digital-dashboard/master/media/pi.jpg "digital dashboard")
+
 even though nobody will ever use this or attempt to make this but me, heres some ~documentation~ about how it works and remaking it:
 
 ### parts
@@ -14,9 +16,17 @@ even though nobody will ever use this or attempt to make this but me, heres some
 
 i got one of the backup cameras that installs behind the license plate, which i recommend. routed the cable through the back seats and up into the front dash.
 
+![Reverse Camera](https://raw.githubusercontent.com/isaiahkahler/digital-dashboard/master/media/reverse1.jpg "Reverse Camera")
+![Reverse Camera 2](https://raw.githubusercontent.com/isaiahkahler/digital-dashboard/master/media/reverse2.jpg "Reverse Camera 2")
+![Camera Cable](https://raw.githubusercontent.com/isaiahkahler/digital-dashboard/master/media/wiring2.jpg "Camera Cable")
+
 in order to power the camera, you have to wire it up to one of your reverse lights, which i just did by cutting the wires, soldering on, and then taped it up (probably not ideal, but it works).
 
+![Reverse Wiring](https://raw.githubusercontent.com/isaiahkahler/digital-dashboard/master/media/wiring.jpg "Reverse Wiring")
+
 the OBD-II thing is always plugged into my car's port. i didn't want to go with a bluetooth one because of like latency and battery drain and whatnot,but the software should work either way.
+
+![OBD-II Adapter](https://raw.githubusercontent.com/isaiahkahler/digital-dashboard/master/media/obd.jpg "OBD-II Adapter")
 
 ### software setup
 
