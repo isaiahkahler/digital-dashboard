@@ -1,4 +1,4 @@
-hi this is a project i did over winter break in 2018. its a digital dashboard of my car that displays RPM, speed, fuel level, and coolant temperature. it gives an alert message for any diagnostic trouble codes (check engine light), so save yourself a trip to the mechanic. it also has a button that launches a rear-view camera.
+hi this is a project i did over winter break in 2018. its a digital dashboard of my car that displays RPM, speed, fuel level, and coolant temperature. it gives an alert message for any diagnostic trouble codes (check engine light), and has a button that launches a rear-view camera.
 
 ![digital dashboard](https://raw.githubusercontent.com/isaiahkahler/digital-dashboard/master/media/pi.jpg "digital dashboard")
 
