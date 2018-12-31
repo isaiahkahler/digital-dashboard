@@ -40,7 +40,7 @@ async def producer_handler(websocket, path):
 async def consumer_handler(websocket, path):
     # async for message in websocket:
     while True:
-        message = await websocket.revc()
+        message = await websocket.recvs()
         msg = json.loads(message)
         if 'show-camera' in msg and msg['show-camera'] == True:
             os.system('mplayer -slave -input file=/home/pi/digital-dashboard/fifofile tv:// -tv driver=v4l2:norm=NTSC_443:device=/dev/video0 -framedrop -fs &')
