@@ -77,7 +77,8 @@ interface DashState {
   speed: number,
   // gas: number,
   temp: number,
-  messages: string[]
+  messages: string[],
+  showMessages: boolean
 }
 
 export class Dash extends React.Component<DashProps, DashState> {
@@ -92,7 +93,8 @@ export class Dash extends React.Component<DashProps, DashState> {
       speed: 0,
       // gas: 0,
       temp: 0,
-      messages: []
+      messages: ["fdjsfljdsklf fdsj lfdksa jfkld sajfkd ajf dsjalkfjd klasjfklds ak fjdka fjdklsa jfkld ajklfd js klfds l"],
+      showMessages: false
     }
   }
 
@@ -134,6 +136,13 @@ export class Dash extends React.Component<DashProps, DashState> {
     this.socket && this.socket.send(JSON.stringify({ 'show-camera': true }))
   }
 
+  toggleMessages = () => {
+    this.setState(previousState => ({
+      ...previousState,
+      showMessages: !previousState.showMessages
+    }))
+  }
+
   render() {
 
     // const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -158,8 +167,10 @@ export class Dash extends React.Component<DashProps, DashState> {
           <CenterColumn>
             <h2 style={{ margin: "5vh 0px" }}>{this.state.time}</h2>
             <MessagesContainer>
-              {this.state.messages.map((item, index) => {
-                return (<div key={index}>
+              {this.state.messages.length !== 0 && !this.state.showMessages && 
+              <div onClick={this.toggleMessages}><Alert style={{ display: "inline", verticalAlign: "middle" }} /></div>}
+              {this.state.showMessages && this.state.messages.map((item, index) => {
+                return (<div key={index} onClick={this.toggleMessages}>
                   <Alert style={{ display: "inline", verticalAlign: "middle" }} />
                   <h3 style={{ display: "inline", verticalAlign: "middle" }}>{item}</h3>
                 </div>)
