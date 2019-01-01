@@ -2,6 +2,7 @@ import obd
 import asyncio
 import websockets
 import os
+import time
 import json
 
 print('finished imports')
@@ -42,7 +43,7 @@ async def consumer_handler(websocket, path):
             await asyncio.sleep(45)
             os.system('echo "quit" > /home/pi/digital-dashboard/fifofile &')
         elif 'get-temp' in msg and msg['get-temp'] == True:
-            await asyncio.sleep(0.05)
+            time.sleep(0.05)
             temp = connection.query(obd.commands.COOLANT_TEMP)
             if not temp.is_null():
                 temp = min(

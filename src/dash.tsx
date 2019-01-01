@@ -104,6 +104,8 @@ export class Dash extends React.Component<DashProps, DashState> {
     if (!socket) return;
     socket.addEventListener('open', () => {
       socket.send('hi');
+      this.getCoolantTemp();
+      // this.getGasLevel();
       socket.addEventListener('message', (msg) => {
         const data = JSON.parse(msg.data);
         if ("alerts" in data) {
@@ -118,8 +120,6 @@ export class Dash extends React.Component<DashProps, DashState> {
       })
     })
     this.updateTime();
-    this.getCoolantTemp();
-    // this.getGasLevel();
   }
 
   updateTime = () => {
