@@ -93,7 +93,7 @@ export class Dash extends React.Component<DashProps, DashState> {
       speed: 0,
       // gas: 0,
       temp: 0,
-      messages: ["fdjsfljdsklf fdsj lfdksa jfkld sajfkd ajf dsjalkfjd klasjfklds ak fjdka fjdklsa jfkld ajklfd js klfds l"],
+      messages: [],
       showMessages: false
     }
   }
