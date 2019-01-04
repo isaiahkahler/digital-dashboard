@@ -42,6 +42,7 @@ download code! then
 ```
 npm install
 npm run build
+sudo npm install -g serve
 ```
 if all of these dependencies are out of date by the time youre reading this, oh well! sorry!
 
