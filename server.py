@@ -50,7 +50,7 @@ async def consumer_handler(websocket, path):
                 100,
                 round(
                     100 * (
-                        (max(60, temp.value.magnitude)) - 60) / 20 # measurement in celsius 
+                        (max(60, temp.value.magnitude)) - 60) / 40 # measurement in celsius 
                     )
                 )
                 await websocket.send(json.dumps({"temp": temp}))
@@ -88,7 +88,7 @@ start_server = websockets.serve(socket_handler, 'localhost', 3001)
 print('websocket server started')
 
 os.system('serve -s /home/pi/digital-dashboard/build &')
-os.system('chromium-browser --kiosk http://localhost:5000 &')
+os.system('chromium-browser --kiosk --incognito http://localhost:5000 &')
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
