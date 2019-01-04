@@ -30,6 +30,14 @@ the OBD-II thing is always plugged into my car's port. i didn't want to go with 
 
 ### software setup
 
+install node .js (if needed)
+note: this might be out of date at time of reading: look it up or something
+
+```
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
 download code! then
 ```
 npm install
