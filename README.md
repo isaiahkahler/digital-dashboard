@@ -73,6 +73,15 @@ add to the end
 ```
 @python3 /home/pi/digital-dashboard/server.py
 ```
+
+and while you're at it, add these lines, that will prevent the pi from turning off the display and going into sleep mode
+
+```
+@xset s noblank
+@xset s off
+@xset -dpms
+```
+
 you might have to install python3, so maybe do that
 
 the `server.py` script does everything, so maybe a lot could go wrong. you'll probably need to change a few things around too.
